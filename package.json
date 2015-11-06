@@ -1,0 +1,32 @@
+{
+  "name": "node-alljoyn",
+  "version": "0.0.1",
+  "description": "Access Alljoyn service functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 0",
+    "install": "node-gyp rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ADVANTECH-Corp/node-alljoyn"
+  },
+  "keywords": [
+    "Alljoyn",
+    "Advantech",
+    "Action"
+  ],
+  "author": "Advantech",
+  "license": "Apache-2.0",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/ADVANTECH-Corp/node-alljoyn/issues"
+  },
+  "engines": {
+    "node": "^0.10.35"
+  },
+  "dependencies": {
+    "bindings": "^1.2.1",
+    "nan": "^1.2.0"
+  }
+}
