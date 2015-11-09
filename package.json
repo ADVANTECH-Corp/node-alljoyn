@@ -1,6 +1,6 @@
 {
   "name": "node-alljoyn",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Access Alljoyn service functions",
   "main": "index.js",
   "scripts": {
@@ -28,5 +28,6 @@
   "dependencies": {
     "bindings": "^1.2.1",
     "nan": "^1.2.0"
-  }
+  },
+  "homepage": "https://github.com/ADVANTECH-Corp/node-alljoyn#readme"
 }

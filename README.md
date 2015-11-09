@@ -1,4 +1,4 @@
-# node-allJoyn
+# node-alljoyn
 Node.js Integration for Alljoyn Service Functions
 
 ## Installation
@@ -22,15 +22,14 @@ This sample prints the device name from your Alljoyn network.
 var alljoyn = require('node-alljoyn');
 
 var result = alljoyn.findAlljoynServices();
-
 if (result == 0) {
-    var dev_num = alljoyn.getDeviceName();
+  var dev_num = alljoyn.getDeviceName();
   
-    for (var i=0; i < dev_num; i++) {
-        console.log('Device Name [' + i + '] = "' + alljoyn.getDeviceName(i) + '"');
-    }
+  for (var i=0; i < dev_num; i++) {
+    console.log('Device Name [' + i + '] = "' + alljoyn.getDeviceName(i) + '"');
+  }
 }
 ```
 
 ## License
-Copyright 2015 ADVANTECH Corp. under [the Apache 2.0 license] (LICENSE).
+Copyright 2015 ADVANTECH Corp. under [the Apache 2.0 license](LICENSE).
