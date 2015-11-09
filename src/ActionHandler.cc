@@ -371,7 +371,7 @@ class MyRenewListener : public AboutListener {
     void Announced(const char* busName, uint16_t version, SessionPort port, const MsgArg& objectDescriptionArg, const MsgArg& aboutDataArg) {
     // Compare AppID and update new busName
     AboutData aboutData(aboutDataArg);
-    char* deviceName;
+    //char* deviceName;
     char* appName;
     uint8_t* appId;
     size_t appId_num;
@@ -536,11 +536,11 @@ NAN_METHOD(doAction)
         if (!introIntf) {
             introIntf = g_bus->GetInterface(ifcName);
 
-            if (!introIntf)
-                remoteObj.AddInterface(*introIntf);
-            else {
-                status = 
+            if (!introIntf) {
+                status = ER_BUS_OBJECT_NO_SUCH_INTERFACE;
                 NanReturnValue(NanNew<v8::Number>((int) status));
+            } else {
+                remoteObj.AddInterface(*introIntf);
             }
         }
 
