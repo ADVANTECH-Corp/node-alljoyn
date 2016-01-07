@@ -12,8 +12,6 @@ We plan to provide three Alljoyn functions in this module.
  - Event Reader & Rule Engine
  - ControlPanel Client
 
-Now, we only support Action.
-
 ### Example
 
 This sample prints the device name from your Alljoyn network.
