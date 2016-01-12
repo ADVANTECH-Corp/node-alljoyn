@@ -25,6 +25,7 @@
 
 #include <signal.h>
 #include <stdio.h>
+#include <vector>
 
 #include "ActionHandler.h"
 /*
@@ -65,8 +66,8 @@ typedef struct AnnouncedData {
     size_t path_num;
 } myAnnouncedData;
 
-myAnnouncedData g_mad[MAX_LENGTH];
-myActions g_mac[MAX_LENGTH];
+std::vector<myAnnouncedData> g_mad;
+std::vector<myActions> g_mac;
 uint g_device_num = 0;
 uint g_interface_num = 0;
 
@@ -254,6 +255,7 @@ void ParseXmlforActionDescription(char* xml)
             int i = 0;
             while (start_pch != NULL)
             {
+				        g_mac.push_back(myActions());
                 char* tmpMethod = GetXmlElementName(start_pch);
                 printf("\t\tmethod name=%s\n", tmpMethod);
 
@@ -305,6 +307,8 @@ class MyAboutListener : public AboutListener {
     char* appName;
     uint8_t* appId;
     size_t appId_num;
+	
+  	g_mad.push_back(myAnnouncedData());
 
     aboutData.GetAppId(&appId, &appId_num);
     memcpy(g_mad[g_device_num].appId, appId, appId_num);
@@ -399,12 +403,12 @@ class MyRenewListener : public AboutListener {
 };
 
 void ResetDevice() {
-    memset(g_mad, 0, MAX_LENGTH * sizeof(myAnnouncedData));
+    g_mad.clear();
     g_device_num = 0;
 }
 
 void ResetIntf() {
-    memset(g_mac, 0, MAX_LENGTH * sizeof(myActions));
+    g_mac.clear();
     g_interface_num = 0;
 }
 

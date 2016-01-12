@@ -25,6 +25,7 @@
 
 #include <signal.h>
 #include <stdio.h>
+#include <vector>
 
 /*
  * Note the removal of almost all Error handling to make the sample code more
@@ -67,8 +68,8 @@ typedef struct AnnouncedData {
     size_t path_num;
 } myAnnouncedData;
 
-myAnnouncedData g_mad[MAX_LENGTH];
-myActions g_mac[MAX_LENGTH];
+std::vector<myAnnouncedData> g_mad;
+std::vector<myActions> g_mac;
 uint g_device_num = 0;
 uint g_interface_num = 0;
 
@@ -261,6 +262,7 @@ void ParseXmlforActionDescription(char* xml)
 			int i = 0;
 			while (start_pch != NULL)
 			{
+        g_mac.push_back(myActions());
 				char* tmpMethod = GetXmlElementName(start_pch);
 				printf("\t\tmethod name=%s\n", tmpMethod);
 
@@ -311,6 +313,7 @@ class MyAboutListener : public AboutListener {
 	char* deviceName;
 	uint8_t* appId;
 	size_t appId_num;
+  g_mad.push_back(myAnnouncedData());
 
 	if (aboutData.GetDeviceName(&deviceName) == ER_OK)
 	{
@@ -406,10 +409,10 @@ class MyAboutListener : public AboutListener {
 	}*/
 
 	// #3: Perform Action method call
-	int device_input = 0;
-	int interface_input = 0;
-	int method_input = 2;
-	QStatus status;
+	//int device_input = 0;
+	//int interface_input = 0;
+	//int method_input = 2;
+	//QStatus status;
 
 	/*SessionId sessionId;
 	SessionOpts opts(SessionOpts::TRAFFIC_MESSAGES, false, SessionOpts::PROXIMITY_ANY, TRANSPORT_ANY);

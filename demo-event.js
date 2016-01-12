@@ -137,10 +137,8 @@ if (!MyStatus) {
     console.log('connect_socket: Err ' + MyStatus);
 }
 
-/*
 //Query event-triger
 console.log("Start Query...");
 var interval = setInterval(function(){
-connect_socket('GET, '+ '0001', PORT_2)
+  connect_socket('GET, '+ '0001', PORT_2)
 }, 2000);
-*/

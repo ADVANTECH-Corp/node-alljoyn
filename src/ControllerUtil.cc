@@ -181,7 +181,8 @@ void GenJansson()
 	CONTAINER_MULTIMAP::iterator ContainerIterator;  
 	CONTAINER_MULTIMAP::iterator PropertyIterator;
 	PROPERTY_MULTIMAP::iterator ValueIterator;
-	
+	std::stringstream title_json;
+
 	//Find Container	
 	ContainerIterator = FindLink<CONTAINER_MULTIMAP>(Target, MyControlPanelData);
 	
@@ -200,7 +201,11 @@ void GenJansson()
 			
 					JanssonString.append("{");
 			   	for(CONTAINER_MULTIMAP::size_type cnt2 = 0; cnt2 != count_2; ++cnt2, ++PropertyIterator) 
-			  	{   	
+			  	{   
+              title_json.str("");
+              title_json << "\"Property_" << cnt2 << "\":";
+              JanssonString.append(title_json.str().c_str());
+	
 				  		//Find Label & Value
 				  		qcc::String Temp_JanssonString="";
 				  		Target=PropertyIterator->second.value;

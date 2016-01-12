@@ -61,7 +61,7 @@ static volatile sig_atomic_t s_interrupt = false;
 // connection between the service and the client using the about feature.
 static void SigIntHandler(int sig) {
     s_interrupt = true;
-    printf("in SigIntHandler\n");
+    exit(EXIT_FAILURE);
 }
 
 BusAttachment* g_bus;
@@ -253,6 +253,7 @@ QStatus alljoyn_connect(void)
 bool init_socket(int *socket_desc, struct sockaddr_in* server, int serv_port)
 {
   bool status = true;
+  int socket_on = 1;
  	//Create socket
   *socket_desc = socket(AF_INET , SOCK_STREAM , 0);
   if (*socket_desc == -1)
@@ -266,7 +267,12 @@ bool init_socket(int *socket_desc, struct sockaddr_in* server, int serv_port)
 	server->sin_family = AF_INET;
 	server->sin_addr.s_addr = htonl(INADDR_ANY);
 	server->sin_port = htons(serv_port);
-	//Bind
+
+  if((setsockopt(*socket_desc,SOL_SOCKET,SO_REUSEADDR,&socket_on,sizeof(socket_on)))<0)  
+  {  
+      perror("setsockopt failed");   
+  } 	
+  //Bind
 	 if( bind(*socket_desc, (struct sockaddr *)server , sizeof(struct sockaddr)) < 0)
 	 {
       status = false;
@@ -331,12 +337,11 @@ void *event_handler(void* args)
 {   
     bool status_socket = true;
   	int socket_desc , new_socket, c , *new_sock;
-  	int serv_port = EVENT_SOCKET_PORT;
     struct sockaddr_in server , client;
  
     // init socket
     memset(&server, 0, sizeof(sockaddr_in));   
-    status_socket = init_socket(&socket_desc, &server, serv_port);
+    status_socket = init_socket(&socket_desc, &server, EVENT_SOCKET_PORT);
     if(!status_socket)
     {
     	perror("socket bind failed");
@@ -434,68 +439,44 @@ void *connection_handler(void *socket_desc)
 int main(int argc, char *argv[] )
 {
   /* Install SIGINT handler so Ctrl + C deallocates memory properly */
-  signal(SIGINT, SigIntHandler);
+    signal(SIGINT, SigIntHandler);
 
 // marco
-	int ret = 0;
-	char sendBuf[1025];
-	int socket_desc , new_socket , c , *new_sock;
-	struct sockaddr_in server , client;
-  QStatus status;
-  pthread_t eventHandler_thread;
-
-  status = alljoyn_connect();
-  if (ER_OK != status)
-  {
-      perror("Alljoyn connect failed");
-      goto SaveExit;
-  }
+    bool status_socket = true;
+  	int ret = 0;
+  	int socket_desc , new_socket , c , *new_sock;
+  	struct sockaddr_in server , client;
+    QStatus status;
+    pthread_t eventHandler_thread;
   
-  if( pthread_create( &eventHandler_thread , NULL ,  event_handler , NULL)) 
-  {
-      perror("could not create eventHandler thread");
-      ret = 1;
-      goto SaveExit;
-  }     
-//
-	//memset(&servAddr, '0', sizeof(servAddr));
-	memset(sendBuf, '0', sizeof(sendBuf));
-																				
+    status = alljoyn_connect();
+    if (ER_OK != status)
+    {
+        perror("Alljoyn connect failed");
+        goto SaveExit;
+    }
+    
+    if( pthread_create( &eventHandler_thread , NULL ,  event_handler , NULL)) 
+    {
+        perror("could not create eventHandler thread");
+        ret = 1;
+        goto SaveExit;
+    }     
+//												
 	//Create socket
-	socket_desc = socket(AF_INET , SOCK_STREAM , 0);
-	if (socket_desc == -1)
-	{
-		printf("Could not create socket");
-	}
-
-	//Prepare the sockaddr_in structure
-	server.sin_family = AF_INET;
-	server.sin_addr.s_addr = htonl(INADDR_ANY);
-	server.sin_port = htons(SOCKSERV_PORT);
-
-	//Bind
-	if( bind(socket_desc, (struct sockaddr *)&server , sizeof(struct sockaddr)) < 0)
-	{
-		printf("bind failed\n");
-		ret = 1;
-		goto SaveExit;
-	}
-	printf("bind done\n");
-
-    //Listen
-    listen(socket_desc, SOCKSERV_MAX_CONN);
-     
+    memset(&server, 0, sizeof(sockaddr_in));   
+    status_socket = init_socket(&socket_desc, &server, SOCKSERV_PORT);
+    if(!status_socket)
+    {
+    	perror("socket bind failed");
+      goto SaveExit;
+    } 
     //Accept and incoming connection
     printf("Waiting for incoming connections...\n");
     c = sizeof(struct sockaddr_in);
     while((new_socket = accept(socket_desc, (struct sockaddr *)&client, (socklen_t*)&c)))
-    {
-        printf("Connection accepted\n");
-         
-        //Reply to the client
-        //message = "Hello Client , I have received your connection. And now I will assign a handler for you\n";
-        //write(new_socket , message , strlen(message));
-         
+    {                             
+        printf("Connection accepted\n");       
         pthread_t sniffer_thread;
         new_sock = (int*)malloc(1);
         *new_sock = new_socket;
@@ -513,7 +494,7 @@ int main(int argc, char *argv[] )
         printf("Handler assigned\n");
     }
 
-    if (s_interrupt == false)
+    if (s_interrupt == true)
     {
         printf("Close socket\n");
 	      ret = 1;

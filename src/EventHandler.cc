@@ -25,6 +25,7 @@
 
 #include <signal.h>
 #include <stdio.h>
+#include <vector>
 
 #include "EventHandler.h"
 /*
@@ -65,8 +66,8 @@ typedef struct AnnouncedData {
     size_t path_num;
 } myAnnouncedData;
 
-myAnnouncedData g_MyAnnounceData[MAX_LENGTH];
-myEvents g_MyEventData[MAX_LENGTH];
+std::vector<myAnnouncedData> g_MyAnnounceData;
+std::vector<myEvents> g_MyEventData;
 uint g_EventDevice_num = 0;
 uint g_EventInterface_num = 0;
 
@@ -291,6 +292,7 @@ void ParseXmlforEventDescription(char* xml)
             int i = 0;
             while (start_pch != NULL)
             {
+				        g_MyEventData.push_back(myEvents());
                 char* tmpMethod = GetXmlElementName_Event(start_pch);
                 printf("\t\tmethod name=%s\n", tmpMethod);
 
@@ -342,6 +344,7 @@ class MyAboutListener : public AboutListener {
     char* appName;
     uint8_t* appId;
     size_t appId_num;
+  	g_MyAnnounceData.push_back(myAnnouncedData());
 
     aboutData.GetAppId(&appId, &appId_num);
     memcpy(g_MyAnnounceData[g_EventDevice_num].appId, appId, appId_num);
@@ -436,12 +439,12 @@ class MyRenewListener : public AboutListener {
 };
 
 void EventResetDevice() {
-    memset(g_MyAnnounceData, 0, MAX_LENGTH * sizeof(myAnnouncedData));
+    g_MyAnnounceData.clear();
     g_EventDevice_num = 0;
 }
 
 void EventResetIntf() {
-    memset(g_MyEventData, 0, MAX_LENGTH * sizeof(myEvents));
+    g_MyEventData.clear();
     g_EventInterface_num = 0;
 }
 

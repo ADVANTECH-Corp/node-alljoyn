@@ -25,6 +25,7 @@
 
 #include <signal.h>
 #include <stdio.h>
+#include <vector>
 
 /*
  * Note the removal of almost all Error handling to make the sample code more
@@ -67,8 +68,8 @@ typedef struct AnnouncedData {
     size_t path_num;
 } myAnnouncedData;
 
-myAnnouncedData g_mad[MAX_LENGTH];
-myActions g_mac[MAX_LENGTH];
+std::vector<myAnnouncedData> g_mad;
+std::vector<myActions> g_mac;
 uint g_device_num = 0;
 uint g_interface_num = 0;
 
@@ -252,9 +253,10 @@ void ParseXmlforActionDescription(char* xml)
 			printf("\t\thas description!\n");
 			// Get action
 			start_pch = strstr(tmpStr, "<method name=");
-			int i = 0;
+			int i = 0; 
 			while (start_pch != NULL)
 			{
+        g_mac.push_back(myActions());
 				char* tmpMethod = GetXmlElementName(start_pch);
 				printf("\t\tmethod name=%s\n", tmpMethod);
 
@@ -278,7 +280,7 @@ void ParseXmlforActionDescription(char* xml)
 				// Check next method
 				start_pch = strstr(start_pch + 8, "<method name=");
 			}
-
+      
 			if (i > 0)
 			{
 				char* tmpPath = GetXmlElementName(xml);
@@ -305,6 +307,8 @@ class MyAboutListener : public AboutListener {
 	char* deviceName;
 	uint8_t* appId;
 	size_t appId_num;
+
+g_mad.push_back(myAnnouncedData());
 
 	if (aboutData.GetDeviceName(&deviceName) == ER_OK)
 	{
@@ -390,14 +394,14 @@ class MyAboutListener : public AboutListener {
 		}
 	}
 
-	for (size_t i = 0; i < g_interface_num; i++) {
+	/*for (size_t i = 0; i < g_interface_num; i++) {
 		printf("Stored Interface Name [%d]: %s\n", (int)i, g_mac[i].interface);
 		printf("\tPath: %s\n", g_mac[i].path);
 		for (size_t j = 0; j < g_mac[i].method_num; j++) {
 			printf("\tmethod[%d]: %s => ", (int)j, g_mac[i].mam[j].method);
 			printf("description:\"%s\"\n", g_mac[i].mam[j].description);
 		}
-	}
+	}*/
 
 	// #3: Perform Action method call
 	int device_input = 0;

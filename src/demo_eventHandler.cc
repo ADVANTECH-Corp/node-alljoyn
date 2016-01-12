@@ -26,6 +26,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include "Rule.h"
+#include <vector>
 
 #define DELETE_IF(x) { if (x) { delete x; x = NULL; } }
 /*
@@ -69,8 +70,8 @@ typedef struct AnnouncedData {
     size_t path_num;
 } myAnnouncedData;
 
-myAnnouncedData g_mad[MAX_LENGTH];
-myActions g_mac[MAX_LENGTH];
+std::vector<myAnnouncedData> g_mad;
+std::vector<myActions> g_mac;
 uint g_device_num = 0;
 uint g_interface_num = 0;
 
@@ -263,6 +264,7 @@ void ParseXmlforActionDescription(char* xml)
 			int i = 0;
 			while (start_pch != NULL)
 			{
+        g_mac.push_back(myActions());
 				char* tmpMethod = GetXmlElementName(start_pch);
 				printf("\t\tmethod name=%s\n", tmpMethod);
 
@@ -313,6 +315,7 @@ class MyAboutListener : public AboutListener {
 	char* deviceName;
 	uint8_t* appId;
 	size_t appId_num;
+  g_mad.push_back(myAnnouncedData());
 
 	if (aboutData.GetDeviceName(&deviceName) == ER_OK)
 	{
@@ -409,11 +412,10 @@ class MyAboutListener : public AboutListener {
 
 	// #3: Perform Action method call
   
-  // æ„¶X®ÏEventDaemon.cc
 	int device_input = 0;
 	int interface_input = 0;
 	int method_input = 2;
-	QStatus status;
+	//QStatus status;
   
   RuleInfo* event = new RuleInfo( g_mad[device_input].busName, g_mad[device_input].path[interface_input], \
 												g_mac[interface_input].interface, g_mac[interface_input].mam[method_input].method,\
