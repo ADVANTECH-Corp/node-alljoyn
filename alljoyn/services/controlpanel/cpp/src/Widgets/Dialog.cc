@@ -184,7 +184,7 @@ void Dialog::setGetLabelsAction3(GetStringFptr getLabelAction3)
 QStatus Dialog::fillOptParamsArg(MsgArg& val, uint16_t languageIndx)
 {
     QStatus status;
-    MsgArg* optParams = new MsgArg[OPT_PARAM_KEYS::NUM_OPT_PARAMS];
+    MsgArg* optParams = new MsgArg[NUM_OPT_PARAMS];//OPT_PARAM_KEYS::NUM_OPT_PARAMS];
 
     size_t optParamIndx = 0;
 
@@ -200,7 +200,8 @@ QStatus Dialog::fillOptParamsArg(MsgArg& val, uint16_t languageIndx)
                                       m_GetLabelsAction1(languageIndx) : m_LabelsAction1[languageIndx].c_str());
 
         if ((status = optParams[optParamIndx].Set(AJPARAM_DICT_UINT16_VAR.c_str(),
-                                                  OPT_PARAM_KEYS::LABEL_ACTION1, labelArg)) != ER_OK) {
+                                                  LABEL_ACTION1, labelArg)) != ER_OK) {
+                                                  //OPT_PARAM_KEYS::LABEL_ACTION1, labelArg)) != ER_OK) {
             delete labelArg;
             delete[] optParams;
             return status;
@@ -213,7 +214,8 @@ QStatus Dialog::fillOptParamsArg(MsgArg& val, uint16_t languageIndx)
                                       m_GetLabelsAction2(languageIndx) : m_LabelsAction2[languageIndx].c_str());
 
         if ((status = optParams[optParamIndx].Set(AJPARAM_DICT_UINT16_VAR.c_str(),
-                                                  OPT_PARAM_KEYS::LABEL_ACTION2, labelArg)) != ER_OK) {
+                               					          LABEL_ACTION2, labelArg)) != ER_OK) {
+                                                  //OPT_PARAM_KEYS::LABEL_ACTION2, labelArg)) != ER_OK) {
             delete labelArg;
             delete[] optParams;
             return status;
@@ -226,7 +228,8 @@ QStatus Dialog::fillOptParamsArg(MsgArg& val, uint16_t languageIndx)
                                       m_GetLabelsAction3(languageIndx) : m_LabelsAction3[languageIndx].c_str());
 
         if ((status = optParams[optParamIndx].Set(AJPARAM_DICT_UINT16_VAR.c_str(),
-                                                  OPT_PARAM_KEYS::LABEL_ACTION3, labelArg)) != ER_OK) {
+					          															LABEL_ACTION3, labelArg)) != ER_OK) {
+                                                  //OPT_PARAM_KEYS::LABEL_ACTION3, labelArg)) != ER_OK) {
             delete labelArg;
             delete[] optParams;
             return status;
@@ -259,7 +262,7 @@ QStatus Dialog::readOptParamsArg(uint16_t key, MsgArg* val)
 {
     QStatus status = ER_BUS_NO_SUCH_PROPERTY;
     switch (key) {
-    case OPT_PARAM_KEYS::LABEL_ACTION1:
+    case LABEL_ACTION1://OPT_PARAM_KEYS::LABEL_ACTION1:
         {
             char* label;
             CHECK_AND_RETURN(val->Get(AJPARAM_STR.c_str(), &label))
@@ -267,7 +270,7 @@ QStatus Dialog::readOptParamsArg(uint16_t key, MsgArg* val)
             break;
         }
 
-    case OPT_PARAM_KEYS::LABEL_ACTION2:
+		case LABEL_ACTION2://OPT_PARAM_KEYS::LABEL_ACTION2:
         {
             char* label;
             CHECK_AND_RETURN(val->Get(AJPARAM_STR.c_str(), &label))
@@ -275,7 +278,7 @@ QStatus Dialog::readOptParamsArg(uint16_t key, MsgArg* val)
             break;
         }
 
-    case OPT_PARAM_KEYS::LABEL_ACTION3:
+    case LABEL_ACTION3://OPT_PARAM_KEYS::LABEL_ACTION3:
         {
             char* label;
             CHECK_AND_RETURN(val->Get(AJPARAM_STR.c_str(), &label))

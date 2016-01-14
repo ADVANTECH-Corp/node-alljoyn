@@ -56,7 +56,7 @@ typedef struct EventData {
     size_t method_num;
 } myEvents;
 
-typedef struct AnnouncedData {
+typedef struct EventAnnouncedData {
     char deviceName[32];
     uint8_t appId[16];
     char appName[32];
@@ -64,9 +64,9 @@ typedef struct AnnouncedData {
     SessionPort port;
     char path[MAX_LENGTH][64];
     size_t path_num;
-} myAnnouncedData;
+} myEventAnnouncedData;
 
-std::vector<myAnnouncedData> g_MyAnnounceData;
+std::vector<myEventAnnouncedData> g_MyAnnounceData;
 std::vector<myEvents> g_MyEventData;
 uint g_EventDevice_num = 0;
 uint g_EventInterface_num = 0;
@@ -336,7 +336,7 @@ void ParseXmlforEventDescription(char* xml)
     }
 }
 
-class MyAboutListener : public AboutListener {
+class MyEventAboutListener : public AboutListener {
     void Announced(const char* busName, uint16_t version, SessionPort port, const MsgArg& objectDescriptionArg, const MsgArg& aboutDataArg) {
     // #1: Get Device Name
     AboutData aboutData(aboutDataArg);
@@ -344,7 +344,7 @@ class MyAboutListener : public AboutListener {
     char* appName;
     uint8_t* appId;
     size_t appId_num;
-  	g_MyAnnounceData.push_back(myAnnouncedData());
+  	g_MyAnnounceData.push_back(myEventAnnouncedData());
 
     aboutData.GetAppId(&appId, &appId_num);
     memcpy(g_MyAnnounceData[g_EventDevice_num].appId, appId, appId_num);
@@ -407,7 +407,7 @@ class MyAboutListener : public AboutListener {
     MySessionListener sessionListener;
 };
 
-class MyRenewListener : public AboutListener {
+class MyEventRenewListener : public AboutListener {
     void Announced(const char* busName, uint16_t version, SessionPort port, const MsgArg& objectDescriptionArg, const MsgArg& aboutDataArg) {
     // Compare AppID and update new busName
     AboutData aboutData(aboutDataArg);
@@ -633,7 +633,7 @@ NAN_METHOD(findAlljoynEventServices)
         }
     }
 
-    MyAboutListener aboutListener;
+    MyEventAboutListener aboutListener;
     const char* interfaces[] = { INTERFACE_NAME };
     if (ER_OK == status) {
         g_EventBus->RegisterAboutListener(aboutListener);
@@ -696,7 +696,7 @@ NAN_METHOD(updateEventBusName)
         }
     }
 
-    MyRenewListener renewListener;
+    MyEventRenewListener renewListener;
     const char* interfaces[] = { INTERFACE_NAME };
     if (ER_OK == status) {
         g_EventBus->RegisterAboutListener(renewListener);

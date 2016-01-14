@@ -34,42 +34,36 @@
  */
 using namespace ajn;
 
-static volatile sig_atomic_t s_interrupt = false;
-
 // The interface name should be the only thing required to find and form a
 // connection between the service and the client using the about feature.
 static const char* INTERFACE_NAME = "org.allseen.Introspectable";
-
-static void SigIntHandler(int sig) {
-    s_interrupt = true;
-}
 
 BusAttachment* g_bus;
 
 #define MAX_LENGTH 50
 
-typedef struct ActionMethod {
+typedef struct EventMember {
     char method[32];
     char description[150];
-} myActionMethod;
+} myEventMember;
 
-typedef struct ActionData {
+typedef struct EventData {
     char path[64];
     char interface[32];
-    myActionMethod mam[MAX_LENGTH];
+    myEventMember mam[MAX_LENGTH];
     size_t method_num;
-} myActions;
+} myEvents;
 
-typedef struct AnnouncedData {
+typedef struct EventAnnouncedData {
     char deviceName[32];
     char busName[32];
     SessionPort port;
     char path[MAX_LENGTH][64];
     size_t path_num;
-} myAnnouncedData;
+} myEventAnnouncedData;
 
-std::vector<myAnnouncedData> g_mad;
-std::vector<myActions> g_mac;
+std::vector<myEventAnnouncedData> g_mad;
+std::vector<myEvents> g_mac;
 uint g_device_num = 0;
 uint g_interface_num = 0;
 
@@ -262,7 +256,7 @@ void ParseXmlforActionDescription(char* xml)
 			int i = 0;
 			while (start_pch != NULL)
 			{
-        g_mac.push_back(myActions());
+        g_mac.push_back(myEvents());
 				char* tmpMethod = GetXmlElementName(start_pch);
 				printf("\t\tmethod name=%s\n", tmpMethod);
 
@@ -306,14 +300,14 @@ void ParseXmlforActionDescription(char* xml)
 	}
 }
 
-class MyAboutListener : public AboutListener {
+class MyEventAboutListener : public AboutListener {
     void Announced(const char* busName, uint16_t version, SessionPort port, const MsgArg& objectDescriptionArg, const MsgArg& aboutDataArg) {
 	// #1: Get Device Name
 	AboutData aboutData(aboutDataArg);
 	char* deviceName;
 	uint8_t* appId;
 	size_t appId_num;
-  g_mad.push_back(myAnnouncedData());
+  g_mad.push_back(myEventAnnouncedData());
 
 	if (aboutData.GetDeviceName(&deviceName) == ER_OK)
 	{
@@ -449,9 +443,6 @@ class MyAboutListener : public AboutListener {
 
 int main(int argc, char** argv)
 {
-    /* Install SIGINT handler so Ctrl + C deallocates memory properly */
-    signal(SIGINT, SigIntHandler);
-
     QStatus status;
 
     BusAttachment bus("AboutServiceTest", true);
@@ -474,7 +465,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    MyAboutListener aboutListener;
+    MyEventAboutListener aboutListener;
     bus.RegisterAboutListener(aboutListener);
 
     const char* interfaces[] = { INTERFACE_NAME };
@@ -485,17 +476,6 @@ int main(int argc, char** argv)
         printf("WhoImplements call FAILED with status %s\n", QCC_StatusText(status));
         exit(1);
     }
-
-    /* Perform the service asynchronously until the user signals for an exit. */
-    if (ER_OK == status) {
-        while (s_interrupt == false) {
-#ifdef _WIN32
-            Sleep(100);
-#else
-            usleep(100 * 1000);
-#endif
-        }
-    }
-
+    
     return 0;
 }
