@@ -149,9 +149,11 @@ NAN_METHOD(setProperty)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status){
 				std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
+        status = controlPanelDevice->endSession();
 				NanReturnValue(NanNew<v8::String>(""));
 		}else{
-     		NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
+     		 status = controlPanelDevice->endSession();
+         NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
     }
 }
 
@@ -174,8 +176,10 @@ NAN_METHOD(getProperty)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status){
 				std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
-				NanReturnValue(NanNew<v8::String>(""));
+				status = controlPanelDevice->endSession();
+        NanReturnValue(NanNew<v8::String>(""));
 		}else{
+        status = controlPanelDevice->endSession();
      		NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
     }
 }
@@ -209,6 +213,7 @@ NAN_METHOD(getControlPanel)
 			std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
 		
     if (args.Length() < 2){
+        status = controlPanelDevice->endSession();
         NanReturnValue(NanNew<v8::Number>(MyControlPanelData.size()));
     }else{
     	  uint32_t total = 0;
@@ -234,13 +239,15 @@ NAN_METHOD(getControlPanel)
 		        	      */
 		        	  }
 		        }
-        		temp = Select_ControlPanel.index;
+        		status = controlPanelDevice->endSession();
+            temp = Select_ControlPanel.index;
         		if (temp == CP_index){
             		NanReturnValue(NanNew<v8::String>(Select_ControlPanel.value.c_str()));
             }else{
             		NanReturnValue(NanNew<v8::String>(""));
             }		        		
 				}else{
+            status = controlPanelDevice->endSession();
             NanReturnValue(NanNew<v8::String>(""));
         }
     }
@@ -273,6 +280,15 @@ NAN_METHOD(getControlPanelDeviceName)
     }
 }
 
+void ControlPanelResetDevice() {
+  MyDevice.clear();
+}
+
+void ControlPanelResetIntf() {
+  MyControlPanelData.clear();
+  MyPropertyData.clear(); 
+  JanssonString.clear();
+}
 void ControlPanel_Bus_Deinit() {
     /* Deallocate bus */
     if (bus)
@@ -296,8 +312,8 @@ NAN_METHOD(findControlPanelServices)
     QStatus status = ER_OK;
 
     /* Reset status */
-    //ResetDevice();
-    //ResetIntf();
+    ControlPanelResetDevice();
+    ControlPanelResetIntf();
     
     controlPanelService = ControlPanelService::getInstance();
     srpKeyXListener = new SrpKeyXListener();

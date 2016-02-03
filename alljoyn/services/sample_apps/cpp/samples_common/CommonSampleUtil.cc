@@ -18,6 +18,7 @@
 #include "CommonSampleUtil.h"
 #include "AboutObjApi.h"
 #include <qcc/StringUtil.h>
+#include <stdio.h>
 
 using namespace ajn;
 using namespace services;
