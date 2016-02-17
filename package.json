@@ -1,6 +1,6 @@
 {
   "name": "node-alljoyn",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Access Alljoyn service functions",
   "main": "index.js",
   "scripts": {

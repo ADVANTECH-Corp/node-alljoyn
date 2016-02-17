@@ -317,7 +317,6 @@ void ControllerUtil::printRootWidget(RootWidget* rootWidget)
     std::vector<Dialog*> dialogsToExecute;
 
     if (rootWidget->getWidgetType() == WIDGET_TYPE_CONTAINER){
-				std::cout << "[Test] levle: " << nowAnnouncedData.runLevel << ", index: " << nowAnnouncedData.index << std::endl;
 				if (nowAnnouncedData.runLevel == 1){
 						erase_ObjectSTL<CONTAINER_MULTIMAP>(MyControlPanelData);
 				    
@@ -352,7 +351,7 @@ void ControllerUtil::printRootWidget(RootWidget* rootWidget)
 						      	 	if (NowProperty->getIsWritable() && new_value != orig_value){
 										      //ListValue(NowProperty, MyPropertyData);
 									       status = NowProperty->setValue((uint16_t)new_value);
-							      	}
+							      	}                      
 										}else{
 											status = ER_WRITE_ERROR  ;
 										}

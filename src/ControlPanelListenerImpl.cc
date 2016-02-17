@@ -32,7 +32,7 @@ ControlPanelListenerImpl::~ControlPanelListenerImpl()
 }
 
 void ControlPanelListenerImpl::sessionEstablished(ControlPanelDevice* device)
-{
+{	
     if (find(m_ConnectedDevices.begin(), m_ConnectedDevices.end(), device->getDeviceBusName()) != m_ConnectedDevices.end()) {
         std::cout << "Received session established for device which was already parsed - ignoring: " << device->getDeviceBusName().c_str() << std::endl;
         return;
@@ -75,12 +75,10 @@ void ControlPanelListenerImpl::sessionLost(ControlPanelDevice* device)
 #else
     sleep(5);
 #endif
-std::cout << "Pass1 " << std::endl;
     std::vector<qcc::String>::iterator iter;
     iter = find(m_ConnectedDevices.begin(), m_ConnectedDevices.end(), device->getDeviceBusName());
     if (iter != m_ConnectedDevices.end()) {
         m_ConnectedDevices.erase(iter);
-std::cout << "Pass2 " << std::endl;
     }
 
     if (m_Controller) {

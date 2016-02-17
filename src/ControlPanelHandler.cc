@@ -98,8 +98,8 @@ static void announceHandlerCallback(qcc::String const& busName, unsigned short v
     char* deviceName;
     char* appName;
     uint8_t* appId;
-    size_t appId_num;
-    
+    size_t appId_num;  
+
     uint32_t index = MyDevice.size();
 		AboutData v_aboutData(aboutData);
 		
@@ -123,10 +123,11 @@ static void announceHandlerCallback(qcc::String const& busName, unsigned short v
     temp_announceData.port = port;
 		temp_announceData.runLevel = 0; // First, need to 0
 		MyDevice.insert(std::pair<uint32_t, myAnnouncedData>(index, temp_announceData));
-    //std::cout << "Got announceHandlerCallback -->" <<  busName << std::endl;
 		
-		//Start Session
-		controlPanelController->createControllableDevice(busName, objectDescription);
+	//Start Session
+	controlPanelController->createControllableDevice(busName, objectDescription);
+    //do jobs in createControllableDevice()
+
 }
 
 NAN_METHOD(setProperty)
@@ -149,10 +150,10 @@ NAN_METHOD(setProperty)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status){
 				std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
-        status = controlPanelDevice->endSession();
+        //status = controlPanelDevice->endSession();
 				NanReturnValue(NanNew<v8::String>(""));
 		}else{
-     		 status = controlPanelDevice->endSession();
+     		 //status = controlPanelDevice->endSession();
          NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
     }
 }
@@ -176,10 +177,10 @@ NAN_METHOD(getProperty)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status){
 				std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
-				status = controlPanelDevice->endSession();
+				//status = controlPanelDevice->endSession();
         NanReturnValue(NanNew<v8::String>(""));
 		}else{
-        status = controlPanelDevice->endSession();
+        //status = controlPanelDevice->endSession();
      		NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
     }
 }
@@ -213,7 +214,7 @@ NAN_METHOD(getControlPanel)
 			std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
 		
     if (args.Length() < 2){
-        status = controlPanelDevice->endSession();
+        //status = controlPanelDevice->endSession();
         NanReturnValue(NanNew<v8::Number>(MyControlPanelData.size()));
     }else{
     	  uint32_t total = 0;
@@ -237,9 +238,9 @@ NAN_METHOD(getControlPanel)
 		        				std::cout << "[Select] " << it_ControlPanelData->first << " , " << it_ControlPanelData->second.index<<"," \
 								    << it_ControlPanelData->second.value <<","<< it_ControlPanelData->second.label<< std::endl;		
 		        	      */
-		        	  }
+		        	  } 
 		        }
-        		status = controlPanelDevice->endSession();
+        		//status = controlPanelDevice->endSession();
             temp = Select_ControlPanel.index;
         		if (temp == CP_index){
             		NanReturnValue(NanNew<v8::String>(Select_ControlPanel.value.c_str()));
@@ -247,7 +248,7 @@ NAN_METHOD(getControlPanel)
             		NanReturnValue(NanNew<v8::String>(""));
             }		        		
 				}else{
-            status = controlPanelDevice->endSession();
+            //status = controlPanelDevice->endSession();
             NanReturnValue(NanNew<v8::String>(""));
         }
     }
@@ -289,6 +290,7 @@ void ControlPanelResetIntf() {
   MyPropertyData.clear(); 
   JanssonString.clear();
 }
+
 void ControlPanel_Bus_Deinit() {
     /* Deallocate bus */
     if (bus)
@@ -318,8 +320,7 @@ NAN_METHOD(findControlPanelServices)
     controlPanelService = ControlPanelService::getInstance();
     srpKeyXListener = new SrpKeyXListener();
 
-    bus = CommonSampleUtil::prepareBusAttachment(srpKeyXListener);
-		ControlPanel_Bus_Init();
+	  ControlPanel_Bus_Init();
 		
     if (!bus) {
         status = ER_OUT_OF_MEMORY;
