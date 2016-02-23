@@ -110,12 +110,12 @@ static void announceHandlerCallback(qcc::String const& busName, unsigned short v
     strcpy(temp_announceData.appName, appName);
 
     if (v_aboutData.GetDeviceName(&deviceName) == ER_OK){
-			std::cout <<"[Test] DeviceName:" << deviceName << std::endl;
+			std::cout <<"[ControlPanelHandler-announceHandlerCallback] DeviceName:" << deviceName << std::endl;
     } else {
 			v_aboutData.GetAppName(&appName);
 			v_aboutData.GetAppId(&appId, &appId_num);
 			sprintf(deviceName, "%s %2x%2x%2x%2x", appName, appId[12], appId[13], appId[14], appId[15]);
-			std::cout << "[Test] AppName + AppId:" << deviceName << std::endl;
+			std::cout << "[ControlPanelHandler-announceHandlerCallback] AppName + AppId:" << deviceName << std::endl;
     }
     
     strcpy(temp_announceData.deviceName, deviceName);
@@ -132,7 +132,6 @@ static void announceHandlerCallback(qcc::String const& busName, unsigned short v
 
 NAN_METHOD(setProperty)
 {
-		std::cout << "in setProperty"<< std::endl;
 		NanScope();
 		QStatus status = ER_OK;	
 
@@ -150,18 +149,15 @@ NAN_METHOD(setProperty)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status){
 				std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
-        //status = controlPanelDevice->endSession();
-				NanReturnValue(NanNew<v8::String>(""));
+				NanReturnValue(NanNew<v8::String>("N/A"));
 		}else{
-     		 //status = controlPanelDevice->endSession();
+     		 
          NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
     }
 }
 
-
-NAN_METHOD(getProperty)
+NAN_METHOD(updateProperty)
 {
-		std::cout << "in getProperty"<< std::endl;
 		NanScope();
 		QStatus status = ER_OK;	
 
@@ -177,31 +173,51 @@ NAN_METHOD(getProperty)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status){
 				std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
-				//status = controlPanelDevice->endSession();
-        NanReturnValue(NanNew<v8::String>(""));
+        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
 		}else{
-        //status = controlPanelDevice->endSession();
-     		NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
+        NanReturnValue(NanNew<v8::Number>((int)status));
     }
 }
 
-NAN_METHOD(getControlPanel)
+NAN_METHOD(getProperty)
 {
-		std::cout << "in getControlPanel"<< std::endl;
+		NanScope();
+    int num_PropertyData = MyPropertyData.size();
+		
+    if (args.Length() < 1) {
+        NanReturnValue(NanNew<v8::Number>((int) num_PropertyData));
+    }
+    uint32_t CP_index = args[0]->Uint32Value();
+    if (CP_index == nowAnnouncedData.index)
+    {
+        if (num_PropertyData < 1) {
+            NanReturnValue(NanNew<v8::String>("N/A"));
+     		}else{    
+         		NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
+        }
+    }else
+    {
+        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    }
+		
+}
+
+NAN_METHOD(updateControlPanel)
+{
 		NanScope();
 		QStatus status = ER_OK;
     
     if (args.Length() < 1) {
         NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
     }
-
+    
     //If no parameter, we return the size of device name.
     //Otherwise, we return the device name of index.
     uint32_t dev_index = args[0]->Uint32Value();
     std::map<uint32_t, myAnnouncedData>::iterator ret_iter;
        
 		ret_iter = MyDevice.find(dev_index);
-		std::cout << "[Test] select Dev: " << ret_iter->second.deviceName << std::endl;
+		//std::cout << "[ControlPanelHandler-updateControlPanel] select Dev: " << ret_iter->second.deviceName << std::endl;
 		
 		nowAnnouncedData = ret_iter->second;
 		nowAnnouncedData.runLevel = 1;
@@ -212,45 +228,55 @@ NAN_METHOD(getControlPanel)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status)
 			std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
-		
-    if (args.Length() < 2){
-        //status = controlPanelDevice->endSession();
-        NanReturnValue(NanNew<v8::Number>(MyControlPanelData.size()));
-    }else{
-    	  uint32_t total = 0;
-    	  uint32_t temp = 0;
-    	      
-        uint32_t CP_index = args[1]->Uint32Value();
-        ContainerObject Select_ControlPanel;
-    		CONTAINER_TYPE::iterator it_ControlPanelData;
-    		
-    		total = MyControlPanelData.size();
-    		if (CP_index < total){	 		
-		    		for (it_ControlPanelData = MyControlPanelData.begin() ; it_ControlPanelData != MyControlPanelData.end() ; ++it_ControlPanelData)
-		    		{
-		    				temp = it_ControlPanelData->second.index;
-		        		if (temp == CP_index){
-		        				Select_ControlPanel = it_ControlPanelData->second;
-		        				nowAnnouncedData.index = CP_index;
-		        				
-		        				/* Debug */
-		        				/*
-		        				std::cout << "[Select] " << it_ControlPanelData->first << " , " << it_ControlPanelData->second.index<<"," \
-								    << it_ControlPanelData->second.value <<","<< it_ControlPanelData->second.label<< std::endl;		
-		        	      */
-		        	  } 
-		        }
-        		//status = controlPanelDevice->endSession();
-            temp = Select_ControlPanel.index;
-        		if (temp == CP_index){
-            		NanReturnValue(NanNew<v8::String>(Select_ControlPanel.value.c_str()));
-            }else{
-            		NanReturnValue(NanNew<v8::String>(""));
-            }		        		
-				}else{
-            //status = controlPanelDevice->endSession();
-            NanReturnValue(NanNew<v8::String>(""));
-        }
+
+    int num_ControlPanel = MyControlPanelData.size();		
+    if (num_ControlPanel < 0)
+      NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    else   
+      NanReturnValue(NanNew<v8::Number>((int)status));
+}
+
+NAN_METHOD(getControlPanel)
+{
+		NanScope();
+    
+    if (args.Length() < 1) {
+        NanReturnValue(NanNew<v8::Number>( MyControlPanelData.size()));
+    } else {        
+        	  uint32_t total = 0;
+        	  uint32_t temp = 0;
+        	      
+            uint32_t CP_index = args[0]->Uint32Value();
+            ContainerObject Select_ControlPanel;
+        		CONTAINER_TYPE::iterator it_ControlPanelData;
+        		
+        		total = MyControlPanelData.size();
+        		if (CP_index < total){	 		
+    		    		for (it_ControlPanelData = MyControlPanelData.begin() ; it_ControlPanelData != MyControlPanelData.end() ; ++it_ControlPanelData)
+    		    		{
+    		    				temp = it_ControlPanelData->second.index;
+    		        		if (temp == CP_index){
+    		        				Select_ControlPanel = it_ControlPanelData->second;
+    		        				nowAnnouncedData.index = CP_index;
+    		        				
+    		        				/* Debug */
+    		        				/*
+    		        				std::cout << "[Select] " << it_ControlPanelData->first << " , " << it_ControlPanelData->second.index<<"," \
+    								    << it_ControlPanelData->second.value <<","<< it_ControlPanelData->second.label<< std::endl;		
+    		        	      */
+    		        	  } 
+    		        }
+            		
+                temp = Select_ControlPanel.index;
+            		if (temp == CP_index){
+                    NanReturnValue(NanNew<v8::String>(Select_ControlPanel.value.c_str()));
+                }else{
+                    NanReturnValue(NanNew<v8::String>("N/A"));
+                }
+            }else
+            {
+                NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+            }        
     }
 }
 
@@ -277,7 +303,7 @@ NAN_METHOD(getControlPanelDeviceName)
 		        NanReturnValue(NanNew<v8::String>(ret_iter->second.deviceName));
 		    
 		    }else
-		        NanReturnValue(NanNew<v8::String>(""));
+		        NanReturnValue(NanNew<v8::String>("N/A"));
     }
 }
 
@@ -306,9 +332,7 @@ void ControlPanel_Bus_Init() {
 }
 
 NAN_METHOD(findControlPanelServices)
-{	    
- 		std::cout << "in findControlPanelServices"<< std::endl;
-    
+{	        
     NanScope();
 
     QStatus status = ER_OK;

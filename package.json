@@ -1,6 +1,6 @@
 {
   "name": "node-alljoyn",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Access Alljoyn service functions",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,8 @@
   "keywords": [
     "Alljoyn",
     "Advantech",
-    "Action"
+    "Action",
+    "ControlPanel"
   ],
   "author": "Advantech",
   "license": "Apache-2.0",

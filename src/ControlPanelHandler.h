@@ -5,7 +5,9 @@
 
 NAN_METHOD(findControlPanelServices);
 NAN_METHOD(getControlPanelDeviceName);
+NAN_METHOD(updateControlPanel);
 NAN_METHOD(getControlPanel);
+NAN_METHOD(updateProperty);
 NAN_METHOD(getProperty);
 NAN_METHOD(setProperty);
 

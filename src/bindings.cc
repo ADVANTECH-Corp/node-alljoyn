@@ -42,8 +42,12 @@ void function_init(Handle<Object> exports) {
         NanNew<FunctionTemplate>(findControlPanelServices)->GetFunction());
     exports->Set(NanNew<String>("getControlPanel"),
         NanNew<FunctionTemplate>(getControlPanel)->GetFunction());  
+    exports->Set(NanNew<String>("updateControlPanel"),
+        NanNew<FunctionTemplate>(updateControlPanel)->GetFunction());
     exports->Set(NanNew<String>("getControlPanelDeviceName"),
         NanNew<FunctionTemplate>(getControlPanelDeviceName)->GetFunction());     
+    exports->Set(NanNew<String>("updateProperty"),
+        NanNew<FunctionTemplate>(updateProperty)->GetFunction());
     exports->Set(NanNew<String>("getProperty"),
         NanNew<FunctionTemplate>(getProperty)->GetFunction());  
     exports->Set(NanNew<String>("setProperty"),

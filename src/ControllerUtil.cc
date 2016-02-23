@@ -324,8 +324,13 @@ void ControllerUtil::printRootWidget(RootWidget* rootWidget)
 				    ListContainer((Container*)rootWidget, MyControlPanelData);
 				}
 				else if (nowAnnouncedData.runLevel == 2){
-						erase_ObjectSTL<PROPERTY_MULTIMAP>(MyPropertyData);
-						NowContainer = (Container*)LocateContainer((Container*)rootWidget, nowAnnouncedData.index);
+            // Todo fix for rechoose ControlPanel: 
+            erase_ObjectSTL<CONTAINER_MULTIMAP>(MyControlPanelData);
+            ListContainer((Container*)rootWidget, MyControlPanelData);  
+            ///////////////////
+            
+						erase_ObjectSTL<PROPERTY_MULTIMAP>(MyPropertyData);          
+            NowContainer = (Container*)LocateContainer((Container*)rootWidget, nowAnnouncedData.index);
 		
 						//erase_StringMap(ControlPanelJansson);
 				    // List Containers, and Locate the Property
@@ -368,8 +373,8 @@ void ControllerUtil::printRootWidget(RootWidget* rootWidget)
 		    for (it_ControlPanelData = MyControlPanelData.begin() ; it_ControlPanelData != MyControlPanelData.end() ; ++it_ControlPanelData)
 		        std::cout << "[MAP1] " << it_ControlPanelData->first << " , " << it_ControlPanelData->second.index<<"," \
 						<< it_ControlPanelData->second.value <<","<< it_ControlPanelData->second.label<< std::endl;
-				
-		    CONTAINER_MULTIMAP::iterator it_PropertyData;
+				 
+		    PROPERTY_MULTIMAP::iterator it_PropertyData;
 		    for (it_PropertyData = MyPropertyData.begin() ; it_PropertyData != MyPropertyData.end() ; ++it_PropertyData)
 		        std::cout << "[MAP2] " << it_PropertyData->first << " , " << it_PropertyData->second.index<<"," \
 		        	<< it_PropertyData->second.value <<","<< it_PropertyData->second.label<< std::endl;
@@ -415,12 +420,12 @@ void ControllerUtil::ListContainer(Container* container, CONTAINER_MULTIMAP &MyS
 {
 		ContainerObject temp_object;
     std::vector<Widget*> childWidgets = container->getChildWidgets();
-    
+    CONTAINER_MULTIMAP::size_type entries;
     for (size_t i = 0; i < childWidgets.size(); i++) 
     {
     		temp_object.index = i;
         temp_object.value = childWidgets[i]->getWidgetName().c_str();               			   		
-    		
+
     		MySTL.insert(std::pair<qcc::String, ContainerObject>(container->getWidgetName().c_str(), temp_object));
     }
 }
