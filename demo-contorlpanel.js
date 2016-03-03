@@ -17,10 +17,12 @@ for (var i=0; i < dev_num; i++) {
     console.log('Device Name [' + i + '] = "' + alljoyn_action.getControlPanelDeviceName(i) + '"');
 }
 
-var con_num = alljoyn_action.getControlPanel(my_dev);
+alljoyn_action.updateControlPanel(my_dev);
+var con_num = alljoyn_action.getControlPanel();
 console.log('con_num = ' + con_num);           
 for (var i=0; i < con_num; i++) {
     console.log('ControlPanel [' + i + '] = "' + alljoyn_action.getControlPanel(my_dev,i) + '"');
+    alljoyn_action.updateProperty(i);
 		console.log('Property [' + i + '] = "' + alljoyn_action.getProperty(i) + '"');
 }
 //console.log('Property [' + '] = "' + alljoyn_action.getProperty(3) + '"');

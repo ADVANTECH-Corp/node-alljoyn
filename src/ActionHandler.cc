@@ -414,14 +414,14 @@ void ResetIntf() {
 
 NAN_METHOD(updateInterface)
 {
-    NanScope();
+    Nan::HandleScope scope;
 
     uint32_t i;
 
-    if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     } else {
-        i = args[0]->Uint32Value();
+        i = info[0]->Uint32Value();
     }
 
     // #2: Parse XML for description
@@ -460,9 +460,9 @@ NAN_METHOD(updateInterface)
         }
         }
         g_bus->LeaveSession(sessionId);
-        NanReturnValue(NanNew<v8::Number>((int) status));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
     } else {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     }
 
     /*for (size_t i = 0; i < g_interface_num; i++) {
@@ -477,51 +477,51 @@ NAN_METHOD(updateInterface)
 
 NAN_METHOD(getInterfaceName)
 {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 1)
+    if (info.Length() < 1)
     {
-        NanReturnValue(NanNew<v8::Number>((int) g_interface_num));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) g_interface_num));
     } else {
-        uint32_t index = args[0]->Uint32Value();
+        uint32_t index = info[0]->Uint32Value();
         if (index < g_interface_num)
-            NanReturnValue(NanNew<v8::String>(g_mac[index].interface));
+            info.GetReturnValue().Set(Nan::New<v8::String>(g_mac[index].interface).ToLocalChecked());
         else
-            NanReturnValue(NanNew<v8::String>(""));
+            info.GetReturnValue().Set(Nan::New<v8::String>("").ToLocalChecked());
     }
 }
 
 NAN_METHOD(getActionName)
 {
-    NanScope();
+    Nan::HandleScope scope;
     
-    if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     }
 
-    uint32_t itf = args[0]->Uint32Value();
-    if (args.Length() < 2)
+    uint32_t itf = info[0]->Uint32Value();
+    if (info.Length() < 2)
     {
-        NanReturnValue(NanNew<v8::Number>((int) g_mac[itf].method_num));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) g_mac[itf].method_num));
     } else {
-        uint32_t index = args[1]->Uint32Value();
+        uint32_t index = info[1]->Uint32Value();
         if (index < g_mac[itf].method_num)
-            NanReturnValue(NanNew<v8::String>(g_mac[itf].mam[index].description));
+            info.GetReturnValue().Set(Nan::New<v8::String>(g_mac[itf].mam[index].description).ToLocalChecked());
         else
-            NanReturnValue(NanNew<v8::String>(""));
+            info.GetReturnValue().Set(Nan::New<v8::String>("").ToLocalChecked());
     }
 }
 
 NAN_METHOD(doAction)
 {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 3)
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    if (info.Length() < 3)
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
 
-    uint32_t device_input = args[0]->Uint32Value();
-    uint32_t interface_input = args[1]->Uint32Value();
-    uint32_t method_input = args[2]->Uint32Value();
+    uint32_t device_input = info[0]->Uint32Value();
+    uint32_t interface_input = info[1]->Uint32Value();
+    uint32_t method_input = info[2]->Uint32Value();
 
     // #3: Perform Action method call
     SessionId sessionId;
@@ -542,7 +542,7 @@ NAN_METHOD(doAction)
 
             if (!introIntf) {
                 status = ER_BUS_OBJECT_NO_SUCH_INTERFACE;
-                NanReturnValue(NanNew<v8::Number>((int) status));
+                info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
             } else {
                 remoteObj.AddInterface(*introIntf);
             }
@@ -560,24 +560,24 @@ NAN_METHOD(doAction)
         }
     }
     g_bus->LeaveSession(sessionId);
-    NanReturnValue(NanNew<v8::Number>((int) status));
+    info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
 }
 
 NAN_METHOD(getDeviceName)
 {
-    NanScope();
+    Nan::HandleScope scope;
     
     //If no parameter, we return the size of device name.
     //Otherwise, we return the device name of index.
-    if (args.Length() < 1)
+    if (info.Length() < 1)
     {
-        NanReturnValue(NanNew<v8::Number>((int) g_device_num));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) g_device_num));
     } else {
-        uint32_t index = args[0]->Uint32Value();
+        uint32_t index = info[0]->Uint32Value();
     if (index < g_device_num)
-        NanReturnValue(NanNew<v8::String>(g_mad[index].deviceName));
+        info.GetReturnValue().Set(Nan::New<v8::String>(g_mad[index].deviceName).ToLocalChecked());        
     else
-        NanReturnValue(NanNew<v8::String>(""));
+        info.GetReturnValue().Set(Nan::New<v8::String>("").ToLocalChecked());
     }
 }
 
@@ -596,7 +596,7 @@ void Init() {
 
 NAN_METHOD(findAlljoynServices)
 {
-    NanScope();
+    Nan::HandleScope scope;
     QStatus status = ER_OK;
 
     /* Reset status */
@@ -658,12 +658,12 @@ NAN_METHOD(findAlljoynServices)
         Deinit();
     }
 
-    NanReturnValue(NanNew<v8::Number>((int) status));
+    info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
 }
 
 NAN_METHOD(updateBusName)
 {
-    NanScope();
+    Nan::HandleScope scope;
     QStatus status = ER_OK;
 
     Init();
@@ -721,5 +721,5 @@ NAN_METHOD(updateBusName)
         Deinit();
     }
 
-    NanReturnValue(NanNew<v8::Number>((int) status));
+    info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
 }

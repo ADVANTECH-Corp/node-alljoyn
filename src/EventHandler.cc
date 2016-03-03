@@ -450,14 +450,14 @@ void EventResetIntf() {
 
 NAN_METHOD(updateEventInterface)
 {
-    NanScope();
+    Nan::HandleScope scope;
 
     uint32_t i;
 
-    if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     } else {
-        i = args[0]->Uint32Value();
+        i = info[0]->Uint32Value();
     }
 
     // #2: Parse XML for description
@@ -496,9 +496,9 @@ NAN_METHOD(updateEventInterface)
         }
         }
         g_EventBus->LeaveSession(sessionId);
-        NanReturnValue(NanNew<v8::Number>((int) status));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
     } else {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     }
 
     /*for (size_t i = 0; i < g_EventInterface_num; i++) {
@@ -513,76 +513,76 @@ NAN_METHOD(updateEventInterface)
 
 NAN_METHOD(getEventInterfaceName)
 {
-    NanScope();
+    Nan::HandleScope scope;
 
-    if (args.Length() < 1)
+    if (info.Length() < 1)
     {
-        NanReturnValue(NanNew<v8::Number>((int) g_EventInterface_num));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) g_EventInterface_num));
     } else {
-        uint32_t index = args[0]->Uint32Value();
+        uint32_t index = info[0]->Uint32Value();
         if (index < g_EventInterface_num)
-            NanReturnValue(NanNew<v8::String>(g_MyEventData[index].interface));
+            info.GetReturnValue().Set(Nan::New<v8::String>(g_MyEventData[index].interface).ToLocalChecked());
         else
-            NanReturnValue(NanNew<v8::String>(""));
+            info.GetReturnValue().Set(Nan::New<v8::String>("").ToLocalChecked());
     }
 }
 
 NAN_METHOD(getEventName)
 {
-    NanScope();
+    Nan::HandleScope scope;
     
-    if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     }
 
-    uint32_t itf = args[0]->Uint32Value();
-    if (args.Length() < 2)
+    uint32_t itf = info[0]->Uint32Value();
+    if (info.Length() < 2)
     {
-        NanReturnValue(NanNew<v8::Number>((int) g_MyEventData[itf].method_num));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) g_MyEventData[itf].method_num));
     } else {
-        uint32_t index = args[1]->Uint32Value();
+        uint32_t index = info[1]->Uint32Value();
         if (index < g_MyEventData[itf].method_num)
-            NanReturnValue(NanNew<v8::String>(g_MyEventData[itf].mam[index].description));
+            info.GetReturnValue().Set(Nan::New<v8::String>(g_MyEventData[itf].mam[index].description).ToLocalChecked());
         else
-            NanReturnValue(NanNew<v8::String>(""));
+            info.GetReturnValue().Set(Nan::New<v8::String>("").ToLocalChecked());
     }
 }
 
 NAN_METHOD(doEvent)
 {
-    NanScope();
+    Nan::HandleScope scope;
     qcc::String EventJasson;
-    if (args.Length() < 3)
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    if (info.Length() < 3)
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
 
-    uint32_t device_input = args[0]->Uint32Value();
-    uint32_t interface_input = args[1]->Uint32Value();
-    uint32_t method_input = args[2]->Uint32Value();
+    uint32_t device_input = info[0]->Uint32Value();
+    uint32_t interface_input = info[1]->Uint32Value();
+    uint32_t method_input = info[2]->Uint32Value();
 
     EventJasson = GenEventJasson(device_input, interface_input, method_input);
     if (EventJasson.size() != 0){
-        NanReturnValue(NanNew<v8::String>(EventJasson.c_str()));
+        info.GetReturnValue().Set(Nan::New<v8::String>(EventJasson.c_str()).ToLocalChecked());
     }
     else{
-        NanReturnValue(NanNew<v8::String>(""));
+        info.GetReturnValue().Set(Nan::New<v8::String>("").ToLocalChecked());
     }   
 }
 
 NAN_METHOD(getEventDeviceName)
 {
-    NanScope();
+    Nan::HandleScope scope;
     
     //If no parameter, we return the size of device name.
     //Otherwise, we return the device name of index.
-    if (args.Length() < 1)
+    if (info.Length() < 1)
     {
-        NanReturnValue(NanNew<v8::Number>((int) g_EventDevice_num));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) g_EventDevice_num));
     } else {
-        uint32_t index = args[0]->Uint32Value();
+        uint32_t index = info[0]->Uint32Value();
     if (index < g_EventDevice_num)
-        NanReturnValue(NanNew<v8::String>(g_MyAnnounceData[index].deviceName));
+        info.GetReturnValue().Set(Nan::New<v8::String>(g_MyAnnounceData[index].deviceName).ToLocalChecked());
     else
-        NanReturnValue(NanNew<v8::String>(""));
+        info.GetReturnValue().Set(Nan::New<v8::String>("").ToLocalChecked());
     }
 }
 
@@ -601,7 +601,7 @@ void EventInit() {
 
 NAN_METHOD(findAlljoynEventServices)
 {
-    NanScope();
+    Nan::HandleScope scope;
     QStatus status = ER_OK;
 
     /* Reset status */
@@ -663,12 +663,12 @@ NAN_METHOD(findAlljoynEventServices)
         EventDeEventInit();
     }
 
-    NanReturnValue(NanNew<v8::Number>((int) status));
+    info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
 }
 
 NAN_METHOD(updateEventBusName)
 {
-    NanScope();
+    Nan::HandleScope scope;
     QStatus status = ER_OK;
 
     EventInit();
@@ -726,5 +726,5 @@ NAN_METHOD(updateEventBusName)
         EventDeEventInit();
     }
 
-    NanReturnValue(NanNew<v8::Number>((int) status));
+    info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
 }
