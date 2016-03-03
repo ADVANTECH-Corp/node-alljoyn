@@ -132,14 +132,14 @@ static void announceHandlerCallback(qcc::String const& busName, unsigned short v
 
 NAN_METHOD(setProperty)
 {
-		NanScope();
+		Nan::HandleScope scope;
 		QStatus status = ER_OK;	
 
-		if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+		if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     } 
 
-	  v8::String::Utf8Value Utf8Value_Jasson(args[0]->ToString());
+	  v8::String::Utf8Value Utf8Value_Jasson(info[0]->ToString());
 	  const char *char_Jasson = *Utf8Value_Jasson;
 		
 		nowAnnouncedData.runLevel = 3;
@@ -149,23 +149,22 @@ NAN_METHOD(setProperty)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status){
 				std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
-				NanReturnValue(NanNew<v8::String>("N/A"));
+        info.GetReturnValue().Set(Nan::New<v8::String>("N/A").ToLocalChecked());
 		}else{
-     		 
-         NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
+        info.GetReturnValue().Set(Nan::New<v8::String>(JanssonString.c_str()).ToLocalChecked());
     }
 }
 
 NAN_METHOD(updateProperty)
 {
-		NanScope();
+		Nan::HandleScope scope;
 		QStatus status = ER_OK;	
 
-		if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+		if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     } 
 
-    uint32_t CP_index = args[0]->Uint32Value();
+    uint32_t CP_index = info[0]->Uint32Value();
 		
 		nowAnnouncedData.runLevel = 2;
 		nowAnnouncedData.index = CP_index;
@@ -173,47 +172,47 @@ NAN_METHOD(updateProperty)
 		status = controlPanelDevice->startSession();
 		if (ER_OK != status){
 				std::cout << "Could not get ControlPanelDevice." << QCC_StatusText(status) << std::endl;
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
 		}else{
-        NanReturnValue(NanNew<v8::Number>((int)status));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
     }
 }
 
 NAN_METHOD(getProperty)
 {
-		NanScope();
+		Nan::HandleScope scope;
     int num_PropertyData = MyPropertyData.size();
 		
-    if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>((int) num_PropertyData));
+    if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) num_PropertyData));
     }
-    uint32_t CP_index = args[0]->Uint32Value();
+    uint32_t CP_index = info[0]->Uint32Value();
     if (CP_index == nowAnnouncedData.index)
     {
         if (num_PropertyData < 1) {
-            NanReturnValue(NanNew<v8::String>("N/A"));
+            info.GetReturnValue().Set(Nan::New<v8::String>("N/A").ToLocalChecked());
      		}else{    
-         		NanReturnValue(NanNew<v8::String>(JanssonString.c_str()));
+            info.GetReturnValue().Set(Nan::New<v8::String>(JanssonString.c_str()).ToLocalChecked());
         }
     }else
     {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     }
 		
 }
 
 NAN_METHOD(updateControlPanel)
 {
-		NanScope();
+		Nan::HandleScope scope;
 		QStatus status = ER_OK;
     
-    if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+    if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     }
     
     //If no parameter, we return the size of device name.
     //Otherwise, we return the device name of index.
-    uint32_t dev_index = args[0]->Uint32Value();
+    uint32_t dev_index = info[0]->Uint32Value();
     std::map<uint32_t, myAnnouncedData>::iterator ret_iter;
        
 		ret_iter = MyDevice.find(dev_index);
@@ -231,22 +230,23 @@ NAN_METHOD(updateControlPanel)
 
     int num_ControlPanel = MyControlPanelData.size();		
     if (num_ControlPanel < 0)
-      NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+      info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
     else   
-      NanReturnValue(NanNew<v8::Number>((int)status));
+      info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
 }
 
 NAN_METHOD(getControlPanel)
 {
-		NanScope();
+		Nan::HandleScope scope;
     
-    if (args.Length() < 1) {
-        NanReturnValue(NanNew<v8::Number>( MyControlPanelData.size()));
+    if (info.Length() < 1) {
+        info.GetReturnValue().Set(Nan::New<v8::Number>(MyControlPanelData.size()));
     } else {        
         	  uint32_t total = 0;
         	  uint32_t temp = 0;
         	      
-            uint32_t CP_index = args[0]->Uint32Value();
+            uint32_t CP_index = info[0]->Uint32Value();
+            std::cout << "CP_index size:" <<  CP_index << std::endl;
             ContainerObject Select_ControlPanel;
         		CONTAINER_TYPE::iterator it_ControlPanelData;
         		
@@ -269,20 +269,20 @@ NAN_METHOD(getControlPanel)
             		
                 temp = Select_ControlPanel.index;
             		if (temp == CP_index){
-                    NanReturnValue(NanNew<v8::String>(Select_ControlPanel.value.c_str()));
+                    info.GetReturnValue().Set(Nan::New<v8::String>(Select_ControlPanel.value.c_str()).ToLocalChecked());
                 }else{
-                    NanReturnValue(NanNew<v8::String>("N/A"));
+                    info.GetReturnValue().Set(Nan::New<v8::String>("N/A").ToLocalChecked());
                 }
             }else
             {
-                NanReturnValue(NanNew<v8::Number>((int) STATUS_ERR));
+                info.GetReturnValue().Set(Nan::New<v8::Number>((int) STATUS_ERR));
             }        
     }
 }
 
 NAN_METHOD(getControlPanelDeviceName)
 {
-    NanScope();
+    Nan::HandleScope scope;
     
     //If no parameter, we return the size of device name.
     //Otherwise, we return the device name of index.
@@ -290,20 +290,19 @@ NAN_METHOD(getControlPanelDeviceName)
     uint32_t total = 0;
     
     total = MyDevice.size();
-    if (args.Length() < 1)
+    if (info.Length() < 1)
     {
-        NanReturnValue(NanNew<v8::Number>(total));
+        info.GetReturnValue().Set(Nan::New<v8::Number>(total));
     } 
     else 
     {
-        uint32_t index = args[0]->Uint32Value();
+        uint32_t index = info[0]->Uint32Value();
 		    if (index < total)
 		    {
 		    		ret_iter = MyDevice.find(index);
-		        NanReturnValue(NanNew<v8::String>(ret_iter->second.deviceName));
-		    
+            info.GetReturnValue().Set(Nan::New<v8::String>(ret_iter->second.deviceName).ToLocalChecked());
 		    }else
-		        NanReturnValue(NanNew<v8::String>("N/A"));
+		        info.GetReturnValue().Set(Nan::New<v8::String>("N/A").ToLocalChecked());
     }
 }
 
@@ -333,7 +332,7 @@ void ControlPanel_Bus_Init() {
 
 NAN_METHOD(findControlPanelServices)
 {	        
-    NanScope();
+    Nan::HandleScope scope;
 
     QStatus status = ER_OK;
 
@@ -392,5 +391,5 @@ NAN_METHOD(findControlPanelServices)
     	ControlPanel_Bus_Deinit();
     }
     
-    NanReturnValue(NanNew<v8::Number>((int) status));
+    info.GetReturnValue().Set(Nan::New<v8::Number>((int) status));
 }
