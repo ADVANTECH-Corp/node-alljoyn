@@ -143,7 +143,7 @@ NAN_METHOD(setProperty)
 	  const char *char_Jasson = *Utf8Value_Jasson;
 		
 		nowAnnouncedData.runLevel = 3;
-		nowAnnouncedData.index = -1;
+		//nowAnnouncedData.index = -1;
 		nowAnnouncedData.WriteJassonString.assign(char_Jasson);
 	
 		status = controlPanelDevice->startSession();
